@@ -3,27 +3,29 @@ using System.Collections;
 
 public class Mouse : MonoBehaviour {
 
-
-    public Transform cat;
+    float distance;
     public AudioSource aah;
 
 	void FixedUpdate () {
 
-
-        Vector3 directionToCat = cat.position - transform.position;
-        float myAngle = Vector3.Angle(transform.forward, directionToCat);
-        if (myAngle < 180f)
+        foreach (Cat myCat in GameLogic.listOfCats)
         {
-            Ray mouseRay = new Ray(transform.position, directionToCat);
-            RaycastHit mouseRayHitInfo;
-            if (Physics.Raycast(mouseRay, out mouseRayHitInfo, 100f))
+            Vector3 directionToCat = myCat.transform.position - transform.position;
+            float myAngle = Vector3.Angle(transform.forward, directionToCat);
+            distance = Vector3.Distance(myCat.transform.position, transform.position);
+            if (myAngle < 90f)
             {
-                if (mouseRayHitInfo.collider.tag == "Cat")
+                Ray mouseRay = new Ray(transform.position, directionToCat);
+                RaycastHit mouseRayHitInfo;
+                if (Physics.Raycast(mouseRay, out mouseRayHitInfo, distance))
                 {
-                    GetComponent<Rigidbody>().AddForce(-directionToCat.normalized * 1000f);
-                    aah.Play();
-                    //transform.forward = -directionToCat;
-                    //GetComponent<Rigidbody>().velocity *= 2;
+                    if (mouseRayHitInfo.collider.tag == "Cat")
+                    {
+                        //GetComponent<Rigidbody>().AddForce(-directionToCat.normalized * 1000f);
+                        //aah.Play();
+                        transform.forward = -directionToCat;
+                        //GetComponent<Rigidbody>().velocity *= 2;
+                    }
                 }
             }
         }
@@ -31,6 +33,12 @@ public class Mouse : MonoBehaviour {
 
 
 	}
+
+
+    void OnDestroy()
+    {
+        GameLogic.listOfMice.RemoveAt(GameLogic.listOfMice.IndexOf(this));
+    }
 }
 
 

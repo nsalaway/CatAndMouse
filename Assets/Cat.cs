@@ -3,40 +3,62 @@ using System.Collections;
 
 public class Cat : MonoBehaviour {
 
-    public Transform mouse;
 
+
+    float distance;
     public AudioSource num, chomp;
+    public AudioClip numClip;
+
+    Vector3 directionToMouse = new Vector3();
+    float myAngle;
 
 	void FixedUpdate () {
 
-
-        Vector3 directionToMouse = (mouse.position - transform.position);
-        float myAngle = Vector3.Angle(transform.forward, directionToMouse);
-
-        if (myAngle < 90f)
+        //Debug.Log(GameLogic.listOfMice.Count);
+        foreach (Mouse myMouse in GameLogic.listOfMice)
         {
-            Ray catRay = new Ray(transform.position, directionToMouse);
-            RaycastHit catRayHitInfo;
-            if (Physics.Raycast(catRay, out catRayHitInfo, 100f))
+
+            directionToMouse = (myMouse.transform.position - transform.position);
+            myAngle = Vector3.Angle(transform.forward, directionToMouse);
+            distance = Vector3.Distance(myMouse.transform.position, transform.position);
+
+
+            //Vector3 directionToMouse = (mouse.position - transform.position);
+            // float myAngle = Vector3.Angle(transform.forward, directionToMouse);
+            //distance = Vector3.Distance(mouse.position, transform.position);
+
+
+
+            if (myAngle < 90f)
             {
-                if (catRayHitInfo.collider.tag == "Mouse")
+                Ray catRay = new Ray(transform.position, directionToMouse);
+                RaycastHit catRayHitInfo;
+
+                if (Physics.Raycast(catRay, out catRayHitInfo, distance))
                 {
-                    if (catRayHitInfo.distance <= 10)
+                    Debug.DrawRay(transform.position, directionToMouse, Color.green);
+                    if (catRayHitInfo.collider.tag == "Mouse")
                     {
-                        chomp.Play();
-                        Destroy(mouse.gameObject);
+
+                        if (distance < 5)
+                        {
+                            Destroy(myMouse.gameObject);
+                        }
+                        else
+                        {
+                            transform.forward = directionToMouse;
+
+                        }
+
                     }
-                    else
-                    {
-                        //GetComponent<Rigidbody>().AddForce(directionToMouse.normalized * 500f);
-                        num.Play();
-                        transform.forward = directionToMouse;
-                    }
-                    
                 }
             }
+            else
+            {
+                Debug.DrawRay(transform.position, directionToMouse, Color.red);
+            }            
+            
         }
-
 
 	}
 }
